@@ -7,31 +7,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/products")
-public class ProductController {
-
-    private final Environment envoirment;
-    private final CommandGateway commandGateway;
-    @Autowired
-    public ProductController(Environment envoirment, CommandGateway commandGateway) {
-        super();
-        this.envoirment = envoirment;
-        this.commandGateway = commandGateway;
-    }
-
-
+public record ProductController(Environment envoirment,  CommandGateway commandGateway) {
 
     @PostMapping
-    public String createProduct(@RequestBody CreateProductRequestDto productRequestDto) {
-        var createProductCommand =
-                CreateProductCommand.builder()
-                                    .productId(UUID.randomUUID().toString())
-                                    .price(productRequestDto.getPrice())
-                                    .quantity(productRequestDto.getQuantity())
-                                    .title(productRequestDto.getTitle()).build();
-        return commandGateway.sendAndWait(createProductCommand);
+    public String createProduct(@RequestBody @Valid CreateProductRequestDto productRequestDto) {
+        return commandGateway.sendAndWait(CreateProductCommand.builder()
+                .productId(UUID.randomUUID().toString())
+                .price(productRequestDto.getPrice())
+                .quantity(productRequestDto.getQuantity())
+                .title(productRequestDto.getTitle()).build());
     }
 }

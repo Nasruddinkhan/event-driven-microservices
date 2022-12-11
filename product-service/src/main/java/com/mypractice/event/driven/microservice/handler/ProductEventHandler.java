@@ -8,18 +8,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProductEventHandler {
-    private final ProductRepository productRepository;
-
-    public ProductEventHandler(final ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
+public record ProductEventHandler(ProductRepository productRepository) {
 
     @EventHandler
-    public void on(ProductCreatedEvent createdEvent){
-        productRepository.findById(createdEvent.getProductId()).ifPresent((e)-> {
-            throw new RuntimeException("record already present");
-        });
+    public void on(ProductCreatedEvent createdEvent) {
+//        productRepository.findById(createdEvent.getProductId()).ifPresent((e) -> {
+//            throw new RuntimeException("record already present");
+//        });
         final var productEntity = new ProductEntity();
         BeanUtils.copyProperties(createdEvent, productEntity);
         productRepository.save(productEntity);

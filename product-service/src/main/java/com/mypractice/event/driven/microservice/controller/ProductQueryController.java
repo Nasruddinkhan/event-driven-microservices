@@ -1,7 +1,6 @@
 package com.mypractice.event.driven.microservice.controller;
 
 import com.mypractice.event.driven.microservice.dto.ProductResponseDto;
-import com.mypractice.event.driven.microservice.query.FindProductQuery;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,19 +12,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
-public class ProductQueryController {
+public record ProductQueryController(QueryGateway queryGateway) {
 
-    @Autowired
-    QueryGateway queryGateway;
 
     @GetMapping
     public List<ProductResponseDto> getProducts() {
-        final var findProductQuery = new FindProductQuery();
-        final var  products = queryGateway
-                .query(findProductQuery, ResponseTypes.multipleInstancesOf(ProductResponseDto.class)).join();
+        final var products = queryGateway
+                .query(new Object(), ResponseTypes.multipleInstancesOf(ProductResponseDto.class)).join();
         return products;
     }
-
 
 
 }
